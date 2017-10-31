@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>      
+    <link href="/jsnotebook/notebook.css" rel="stylesheet" type="text/css" />    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/jsnotebook/notebook.js"></script>
+    <title>My JavaScript Notebook</title>
+  </head>
+
+  <body>
+    <div class="header"><!-- Title for this notebook page -->
+        <h1>My JavaScript Notebook: Drawing shapes</h1>
+        <div class="menubar"></div>
+    </div>
+    
+    <!-- Describe what this notebook page is showing -->
+    <p>
+      The second thing I learned about was drawing shapes.
+    </p>
+    
+    <!-- This is the code that will run -->
+    <div>
+      <div class="title"> <!-- title bar for the javascript code -->
+        <button onclick="start();">Run</button> <!-- Run button that calls start function when pressed -->
+        Draw Shapes<!-- Program title -->
+      </div>
+
+<script class="code">
+    // Test Code
+    function start() {
+        canvas.prepare();
+        canvas.setBackground("yellow");
+        
+        var r = new Rect(100, 100, 100, 50);
+        r.setLabelColor("#FFF");
+        r.setLabel("Hi");
+
+        canvas.add(r);
+
+        var c = new Circle(500, 300, 50);
+        c.setColor("red");
+        c.setLabel("No.");
+        canvas.add(c);
+
+        var l = new Line( 0, canvas.getHeight(), canvas.getWidth(), 0);
+        canvas.add(l);
+        
+        var t = new Text("Choose:", canvas.getWidth() / 2, 30);
+        t.setFont("Serif");
+        t.setFontSize(50);
+        
+        canvas.add(t);
+        
+        canvas.draw();
+    }
+
+</script>
+      <canvas id="Drawing"></canvas> <!-- Graphics output canvas -->
+      <textarea id="Console"></textarea> <!-- Text output console -->
+    </div>
+    
+  </body>
+</html>
