@@ -37,15 +37,14 @@
 
         canvas.add(r);
 
-        var c = new Circle(500, 300, 50);
+        var c = new Circle(500, 300, 10);
         c.setColor("red");
-        c.setLabel("No.");
         canvas.add(c);
 
         var l = new Line( 0, canvas.getHeight(), canvas.getWidth(), 0);
         canvas.add(l);
         
-        var t = new Text("Choose:", canvas.getWidth() / 2, 30);
+        var t = new Text("Art:", canvas.getWidth() / 2, 30);
         t.setFont("Serif");
         t.setFontSize(50);
         

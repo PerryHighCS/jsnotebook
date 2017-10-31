@@ -354,6 +354,7 @@ class Rect extends Shape {
 
 class Circle extends Shape {
     constructor(x, y, radius) {
+        radius = radius | 5;
         super(x, y);
         this._radius = radius;
     }
