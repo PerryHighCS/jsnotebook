@@ -1,9 +1,10 @@
 <!doctype html>
 <html>
   <head>      
-    <link href="/jsnotebook/notebook.css" rel="stylesheet" type="text/css" />    
+    <link href="/jsnotebook/notebook.css" rel="stylesheet" type="text/css" />   
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="/jsnotebook/notebook.js"></script>
+    
     <title>My JavaScript Notebook</title>
   </head>
 
@@ -25,14 +26,14 @@
         Draw Shapes<!-- Program title -->
       </div>
 
-<script class="code">
+<script class="code line-numbers language-javascript">
     // Test Code
     function start() {
         canvas.prepare();
-        canvas.setBackground("yellow");
+        canvas.setBackground("salmon");
         
         var r = new Rect(100, 100, 100, 50);
-        r.setLabelColor("#FFF");
+        r.setColor("blue");
         r.setLabel("Hi");
 
         canvas.add(r);
@@ -57,6 +58,5 @@
       <canvas id="Drawing"></canvas> <!-- Graphics output canvas -->
       <textarea id="Console"></textarea> <!-- Text output console -->
     </div>
-    
   </body>
 </html>
