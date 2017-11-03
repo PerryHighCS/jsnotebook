@@ -65,7 +65,7 @@ if (!("_notebooklog" in console)) {
 // Read a line of user input
 function readLine(promptTxt) {
   // Prompt the user for input
-  rval = prompt(promptTxt);
+  let rval = prompt(promptTxt);
 
   // If the user clicks Cancel, throw an exception
   if (rval === null) {
@@ -169,7 +169,7 @@ var canvas = new class {
     add(shape) {         
         this.remove(shape);
         this._shapes.push(shape);
-        $(this._canvas).show();
+        this._canvas.style.display = 'block';
     }
     
     remove(shape) { this._shapes = this._shapes.filter(s => s !== shape); }
@@ -191,20 +191,23 @@ var canvas = new class {
         this._shapes = [];
         this._setup = true;
         
-        let canvas = $("canvas#Drawing");
-        this._canvas = canvas[0];
+        let canvas = document.getElementById("Drawing");
+        this._canvas = canvas;
         
-        this._width = $("body").width();
+        this._width = window.innerWidth ||
+                      document.documentElement.clientWidth ||
+                      document.body.clientWidth ||
+                      document.body.offsetWidth;
         this._height = this._width / 2;
         
-        canvas.attr('width', this._width);
-        canvas.attr('height', this._height);
+        canvas.setAttribute('width', this._width);
+        canvas.setAttribute('height', this._height);
     }
     
     getWidth() { return this._width; }
     
     getHeight() { return this._height; }
-};
+}
 
 class Shape {
     constructor (centerX, centerY) {
@@ -432,13 +435,13 @@ class Line extends Shape {
         this._centerY = y + (this._height / 2);
     }
     
-    setEndX(x) { this._x2 = x; };
+    setEndX(x) { this._x2 = x; }
     
-    getEndX() { return this._x2; };
+    getEndX() { return this._x2; }
     
-    setEndY(y) { this._y2 = y; };
+    setEndY(y) { this._y2 = y; }
     
-    getEndY() { return this._y2; };
+    getEndY() { return this._y2; }
         
     setColor (color) { this._outlineColor = color; }
     
