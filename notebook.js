@@ -1,3 +1,5 @@
+/* global _testResponses */
+
 'use strict';
 
 // Display text in a textArea console
@@ -62,10 +64,47 @@ if (!("_notebooklog" in console)) {
     window.onerror = jserror;
 }
 
+function ask(promptText) {
+    // If there are no test responses defined
+    if (typeof _testResponses === 'undefined' || _testResponses === null) {
+        // Popup a prompt window
+        return prompt(promptText);
+    }
+    else {
+        if(typeof(_testResponses) === 'string') {
+            // IF there are, check if there are multiple lines of responses
+            let end = _testResponses.indexOf('\n');
+            let resp;
+
+            // If there are multiple lines
+            if (end >= 0) {
+                // the current response goes up to the next newline
+                resp = _testResponses.substring(0, end);
+
+                // remove it from the future responses
+                _testResponses = _testResponses.substring(end+1);
+            }
+            else {
+                // get the (last) response
+                resp = _testResponses;
+
+                // and clear out the responses
+                _testResponses = 0;
+            }
+
+            // Return the response
+            return resp;
+        }
+        else {
+            throw "Reading input when none available";
+        }
+    }
+}
+
 // Read a line of user input
 function readLine(promptTxt) {
   // Prompt the user for input
-  let rval = prompt(promptTxt);
+  let rval = ask(promptTxt);
 
   // If the user clicks Cancel, throw an exception
   if (rval === null) {
@@ -84,7 +123,7 @@ function readInt(promptTxt) {
   // Loop until we get our input
   while (true) {
     // Ask the user for the number
-    var rval = prompt(text);
+    var rval = ask(text);
 
     // If the user clicks cancel, throw an exception
     if (rval === null) {
@@ -112,7 +151,7 @@ function readFloat(promptTxt) {
   // Loop until we get our input
   while (true) {
     // Ask the user for the number
-    var rval = prompt(text);
+    var rval = ask(text);
 
     // If the user clicks cancel, throw an exception
     if (rval === null) {
@@ -140,7 +179,7 @@ function readBoolean(promptTxt) {
   // Loop until we get our input
   while (true) {
     // Ask the user for the boolean
-    var rval = prompt(text).toLowerCase();
+    var rval = ask(text).toLowerCase();
 
     // If the user clicks cancel, throw an exception
     if (rval === null) {
@@ -207,7 +246,9 @@ var canvas = new class {
     getWidth() { return this._width; }
     
     getHeight() { return this._height; }
-}
+    
+    getShapes() { return this._shapes; }
+};
 
 class Shape {
     constructor (centerX, centerY) {
