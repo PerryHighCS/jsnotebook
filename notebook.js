@@ -195,6 +195,7 @@ function readBoolean(promptTxt) {
   }
 }
 
+// Create a canvas singleton to control drawing
 var canvas = new class {
     constructor () {
         this._setup = false;
@@ -203,54 +204,113 @@ var canvas = new class {
         this._background = "#fff";
     }
     
+    /**
+     * Set the background color for the canvas
+     * 
+     * @param {String} color HTML color
+     */
     setBackground(color) { this._background = color; }
     
+    /**
+     * Add a shape to the canvas
+     * 
+     * @param {Shape} shape
+     */
     add(shape) {         
-        this.remove(shape);
-        this._shapes.push(shape);
-        this._canvas.style.display = 'block';
+        this.remove(shape); // If the shape is already on the canvas, remove it
+        this._shapes.push(shape); // Add the shape to the list of shapes
+        this._canvas.style.display = 'block'; // Display the canvas if it isn't
     }
     
+    /**
+     * Remove a shape from the canvas
+     * 
+     * @param {Shape} shape
+     */
     remove(shape) { this._shapes = this._shapes.filter(s => s !== shape); }
     
+    /**
+     * Draw all shapes on the canvas
+     */
     draw() {     
+        // Make sure the canvas has been prepared
         if (!this._setup) {
             this.prepare();
         }
         
+        // Get the drawing context
         let ctx = this._canvas.getContext("2d");
         
+        // Clear the canvas by displaying only the background color
         ctx.fillStyle = this._background;
         ctx.fillRect(0, 0, this._width, this._height);
         
+        // Loop through all of the shapes, asking them to draw theirselves
+        // on the drawing context
         this._shapes.forEach(s => s.draw(ctx));
     }
     
-    prepare() {   
+    /**
+     * Prepare the canvas for drawing
+     * 
+     * @param {Number} width the width to make the canvas (optional)
+     * @param {Number} height the height to make the canvas (optional)
+     */
+    prepare(width, height) {   
+        // Clear out the shapes list
         this._shapes = [];
         this._setup = true;
         
+        // Select the drawing canvas
         let canvas = document.getElementById("Drawing");
         this._canvas = canvas;
         
-        this._width = window.innerWidth ||
+        // Calculate the size of the canvas
+        this._width = width || window.innerWidth ||
                       document.documentElement.clientWidth ||
                       document.body.clientWidth ||
                       document.body.offsetWidth;
-        this._height = this._width / 2;
+        this._height = height || this._width / 2;
         
+        // Make the canvas the proper height
         canvas.setAttribute('width', this._width);
         canvas.setAttribute('height', this._height);
     }
     
+    /**
+     * Determine the width of the canvas
+     * 
+     * @returns {Number} the width of the canvas
+     */
     getWidth() { return this._width; }
     
+    /**
+     * Determeine the height of the canvas
+     * 
+     * @returns {Number} the height of the canvas
+     */
     getHeight() { return this._height; }
     
+    /**
+     * Get the list of shapes drawn on the canvas
+     * 
+     * @returns {Shape[]} the array of shape objects
+     */
     getShapes() { return this._shapes; }
 };
 
+/**
+ * A generic shape that can be drawn on a canvas, with optional text label
+ * @type Shape
+ */
 class Shape {
+    /**
+     * Create a shape centered on a point on the canvas
+     * 
+     * @param {Number} centerX
+     * @param {Number} centerY
+     * @returns {Shape}
+     */
     constructor (centerX, centerY) {
         this._centerX = centerX;
         this._centerY = centerY;
@@ -264,20 +324,41 @@ class Shape {
         this._measureLabel();
     }
     
+    /**
+     * Set the x coordinate for the center of the shape
+     * @param {Number} x
+     */
     setX(x) {
         this._x = x;
         this._centerX = x;
     }
     
+    /**
+     * Determine the x coordinate for the center of the shape
+     * @returns {Number}
+     */
     getX() { return this._x; }
     
+    /**
+     * Set the y coordinate for the center of the shape
+     * @param {Number} y
+     */
     setY(y) {
         this._y = y;
         this._centerY = y;
     }
     
+    /**
+     * Determine the y coordinate for the center of the shape
+     * @returns {Number}
+     */
     getY() { return this._y; }
     
+    /**
+     * Set the text to label this shape with
+     * 
+     * @param {String} text the new text to display on the shape
+     */
     setLabel (text) {
         this._text = text;
         this._measureLabel();
@@ -294,7 +375,11 @@ class Shape {
     setColor (color) { this._fillColor = color; }
     
     setOutline (color) { this._outlineColor = color; }
-       
+    
+    /**
+     * Draw this shape on a drawing context
+     * @param {Context2D} drawContext the canvas drawing context to draw on
+     */
     draw (drawContext) {
         drawContext.save();
         
@@ -311,7 +396,13 @@ class Shape {
         
         drawContext.restore();
     }
-        
+    
+    /**
+     * Prepare the drawing context to display the text label
+     * @private
+     * 
+     * @param {Context2D} drawContext
+     */
     _setupText(drawContext) {
         drawContext.fillStyle = this._labelColor;
         drawContext.textBaseline = "middle";
@@ -319,6 +410,10 @@ class Shape {
         drawContext.font = this._fontHeight + "px " + this._labelFont;
     }
     
+    /**
+     * Calculate the size of the label on the canvas
+     * @private
+     */
     _measureLabel() {
         let drawContext = canvas._canvas.getContext("2d");
         
@@ -334,7 +429,19 @@ class Shape {
     }
 }
 
+/**
+ * A rectangle that can be drawn on a canvas
+ * @type Rect
+ */
 class Rect extends Shape {
+    /**
+     * Create a rectangle at a given location with a specified size
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} width
+     * @param {Number} height
+     * @returns {Rect}
+     */
     constructor (x, y, width, height) {
         let centerX = x + (width/2);
         let centerY = y + (height/2);
@@ -368,6 +475,13 @@ class Rect extends Shape {
     
     getHeight() { return this._height; }
     
+    /**
+     * Determine if a point falls within the rectangle
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Boolean}
+     */
     contains(x, y) {
         if ((x >= this._x) && (x <= (this._x + this._width)) &&
             (y >= this._y) && (y <= (this._y + this._width))) {
@@ -377,6 +491,10 @@ class Rect extends Shape {
         return false;
     }
     
+    /**
+     * Draw the rectangle on a canvas's drawing context
+     * @param {Context2d} drawContext
+     */
     draw(drawContext) {
         drawContext.save();
 
@@ -396,7 +514,20 @@ class Rect extends Shape {
     }
 }
 
+/**
+ * A circle that can be drawn on a canvas
+ * 
+ * @type Circle
+ */
 class Circle extends Shape {
+    /**
+     * Create a circle centered on a given point with a specified radius
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @returns {Circle}
+     */
     constructor(x, y, radius) {
         radius = radius | 5;
         super(x, y);
@@ -411,6 +542,13 @@ class Circle extends Shape {
         return this._radius;
     }
     
+    /**
+     * Determine if the circle contains a given point
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Boolean}
+     */
     contains(x, y) {
         let distx = Math.abs(x - this._x);
         let disty = Math.abs(y - this._y);
@@ -424,6 +562,10 @@ class Circle extends Shape {
         return false;
     }
     
+    /**
+     * Draw the circle on a canvas's drawing context
+     * @param {Context2D} drawContext
+     */
     draw(drawContext) {
         drawContext.save();
         
@@ -453,7 +595,20 @@ class Circle extends Shape {
     }
 }
 
+/**
+ * A line that can be drawn on a canvas
+ * @type Line
+ */
 class Line extends Shape {
+    /**
+     * Create a line segment that extends from (x,y) to (x2, y2)
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} x2
+     * @param {Number} y2
+     * @returns {Line}
+     */
     constructor (x, y, x2, y2) {
         let centerX = (x + x2) /2;
         let centerY = (y + y2) /2;
@@ -490,6 +645,12 @@ class Line extends Shape {
     
     setWeight(weight) { this._weight = weight; }
     
+    /**
+     * Determine if a point falls (nearly) on the line
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Boolean}
+     */
     contains(x, y) {
         let a1 = this._x - x;
         let b1 = this._y - y;
@@ -504,7 +665,12 @@ class Line extends Shape {
         
         return Math.abs((d1 + d2) - d3) < 0.005;
     }
-        
+       
+    /**
+     * Draw the line on a canvas's drawing context
+     * 
+     * @param {Context2D} drawContext
+     */
     draw(drawContext) {
         drawContext.save();
 
@@ -525,7 +691,18 @@ class Line extends Shape {
 
 }
 
+/**
+ * A Text object that displays a string on a canvas
+ * @type Text
+ */
 class Text extends Shape {
+    /**
+     * Create a text object displaying a given string centered on (x, y)
+     * @param {String} text
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Text}
+     */
     constructor (text, x, y) {
         super(x, y);        
         super.setLabel(text);
@@ -549,6 +726,13 @@ class Text extends Shape {
     
     setTextOutline (color) { this._labelOutline = color; }
         
+    /**
+     * Determine if a point falls inside of the text display
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Boolean}
+     */
     contains(x, y) {
         this._measureLabel();
         
@@ -563,6 +747,10 @@ class Text extends Shape {
         return false;
     }
     
+    /**
+     * Draw the text on a canvas's drawing context
+     * @param {Context2D} drawContext
+     */
     draw(drawContext) {
         this._measureLabel();
         
