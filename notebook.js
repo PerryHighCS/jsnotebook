@@ -774,3 +774,48 @@ class Text extends Shape {
         drawContext.restore();
     }
 }
+
+class Sprite extends Rect {
+    constructor (x, y, url) {
+        super (x, y);
+        
+        this._x = x;
+        this._y = y;
+        this._img = new Image();
+        
+        let that = this;
+        
+        this._loader = new Promise((resolve, reject)=>{
+            that._img.onload = () => {
+                that._width = that._img.width;
+                that._height = that._img.height;
+                that._centerX = (that._x + that._width) / 2;
+                that._centerY = (that._y + that._height) / 2;
+                resolve();
+            };
+            that._img.onerror = () => {
+                console.error("Couldn't load image: " + url);
+                reject();
+            };
+        });
+        
+        this._img.src = url;        
+    }
+    
+    /**
+     * Draw the text on a canvas's drawing context
+     * @param {Context2D} drawContext
+     */
+    draw(drawContext) {
+        let that = this;
+        
+        this._loader.then(() => {
+            drawContext.save();
+
+            drawContext.drawImage(that._img, that._x, that._y);
+
+            drawContext.restore();
+        });
+    }
+    
+}
