@@ -275,6 +275,11 @@ var canvas = new class {
         // Make the canvas the proper height
         canvas.setAttribute('width', this._width);
         canvas.setAttribute('height', this._height);
+        canvas.addEventListener('mousemove', function(evt){mouseInfo._mouseEvent(evt, this);});
+        canvas.addEventListener('mouseup', function(evt){mouseInfo._mouseEvent(evt, this);});
+        canvas.addEventListener('mousedown', function(evt){mouseInfo._mouseEvent(evt, this);});
+        canvas.addEventListener('mouseout', function(evt){mouseInfo._mouseEvent(null, this);});
+        canvas.addEventListener('contextmenu', (evt) => evt.preventDefault());
     }
     
     /**
@@ -297,6 +302,38 @@ var canvas = new class {
      * @returns {Shape[]} the array of shape objects
      */
     getShapes() { return this._shapes; }
+    
+    /**
+     * Get the topmost shape at a given location on the canvas
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Shape|undefined} the shape at the location or undefined if none
+     */
+    getObjectAt(x, y) {
+        let shapes = getObjectsAt(x, y);    
+        return shapes[shapes.length - 1];
+    }
+    
+    /**
+     * Get all shapes at a given location on the canvas
+     * 
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Shape[]} the shapes at the location
+     */
+    getObjectsAt(x, y) {
+        let shapes = [];
+        
+        this._shapes.forEach(function(shape){ 
+            if (shape.contains(x, y)) {
+                shapes.push(shape);
+            }
+        });
+        
+        return shapes;
+    }
+    
 };
 
 /**
@@ -816,6 +853,56 @@ class Sprite extends Rect {
 
             drawContext.restore();
         });
+    }    
+}
+
+/**
+ * Information about the mouse in the canvas
+ * 
+ * @type MouseInfo
+ */
+var mouseInfo = new class {
+    /**
+     * 
+     */
+    constructor () {
+        this._x = -1;
+        this._y = -1;
+        this._buttons = [];
     }
     
-}
+    set x(x) { this._x = x; }
+    
+    get x() { return this._x; }
+    
+    set y(y) { this._y = y; }
+    
+    get y() {return this._y; }
+    
+    setButton(num, pressed) {this._buttons[num] = pressed;}
+    
+    button(num) { return this._buttons[num];}
+    
+    
+    _mouseEvent(evt, el) {
+        if (evt !== null) {
+            evt.preventDefault();
+            let rect = el.getBoundingClientRect();
+
+            mouseInfo.x = Math.floor((evt.clientX-rect.left)/(rect.right-rect.left)*el.width);
+            mouseInfo.y = Math.floor((evt.clientY-rect.top)/(rect.bottom-rect.top)*el.height);
+
+            mouseInfo.setButton(0, (evt.buttons & 1) === 1);        
+            mouseInfo.setButton(1, (evt.buttons & 2) === 2);        
+            mouseInfo.setButton(2, (evt.buttons & 4) === 4);
+        }
+        else {
+            mouseInfo.x = -1;
+            mouseInfo.y = -1;
+            
+            mouseInfo.setButton(0, false);
+            mouseInfo.setButton(1, false);
+            mouseInfo.setButton(2, false);
+        }
+    }
+};
