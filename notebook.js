@@ -819,6 +819,7 @@ class Sprite extends Rect {
         this._x = x;
         this._y = y;
         this._img = new Image();
+        this._url = url;
         
         let that = this;
         
@@ -828,11 +829,11 @@ class Sprite extends Rect {
                 that._height = that._img.height;
                 that._centerX = (that._x + that._width) / 2;
                 that._centerY = (that._y + that._height) / 2;
-                resolve();
+                resolve(that._img);
             };
             that._img.onerror = () => {
                 console.error("Couldn't load image: " + url);
-                reject();
+                reject(that._img);
             };
         });
         
