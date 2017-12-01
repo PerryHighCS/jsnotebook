@@ -397,7 +397,7 @@ class Shape {
      * @param {String} text the new text to display on the shape
      */
     setLabel (text) {
-        this._text = text;
+        this._text = "" + text;
         this._measureLabel();
     }
     
